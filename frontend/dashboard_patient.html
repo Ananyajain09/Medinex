@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Dashboard — Medinex</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --sidebar-bg: #ffffff;
+      --sidebar-hover: #f5f1eb;
+      --sidebar-active: #eef5ff;
+      --sidebar-border: #e8e0d5;
+      --accent: #1e90ff;
+      --accent-dark: #0b60c1;
+      --accent-muted: #EFF6FF;
+      --bg: #f6f3ef;
+      --surface: #ffffff;
+      --surface-2: #f8f5f2;
+      --border: #e8e0d5;
+      --border-dark: #d6cfc5;
+      --text-primary: #0b2340;
+      --text-secondary: #4a5b74;
+      --text-muted: #8a97a8;
+      --green: #10B981;
+      --green-bg: #ECFDF5;
+      --amber: #F59E0B;
+      --amber-bg: #FFFBEB;
+      --purple: #8B5CF6;
+      --purple-bg: #F5F3FF;
+      --sidebar-w: 252px;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      display: flex;
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--sidebar-border);
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 200;
+      box-shadow: 4px 0 16px rgba(11,35,64,0.05);
+    }
+
+    .sidebar-brand {
+      padding: 26px 22px 22px;
+      border-bottom: 1px solid var(--sidebar-border);
+      display: flex; align-items: center; gap: 11px;
+    }
+
+    .brand-mark {
+      width: 38px; height: 38px; border-radius: 11px;
+      background: linear-gradient(135deg, #0b60c1, #1e90ff, #4fc3f7);
+      position: relative; flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(11,96,193,0.4);
+    }
+    .brand-mark::before {
+      content: "";
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px; height: 20px;
+      background: white; border-radius: 2px;
+    }
+    .brand-mark::after {
+      content: "";
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px; height: 8px;
+      background: white; border-radius: 2px;
+    }
+
+    .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; font-weight: 700;
+      color: var(--text-primary); letter-spacing: -0.3px;
+    }
+
+    .sidebar-section { padding: 18px 12px 4px; }
+    .sidebar-section-label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--text-muted); padding: 0 10px; margin-bottom: 6px;
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: 8px;
+      cursor: pointer; transition: all 0.15s;
+      font-size: 13.5px; font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none; margin-bottom: 1px;
+    }
+    .nav-item:hover { background: var(--sidebar-hover); color: var(--text-primary); }
+    .nav-item.active { background: var(--accent-muted); color: var(--accent); font-weight: 600; }
+    .nav-icon { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.7; }
+    .nav-item.active .nav-icon { opacity: 1; }
+    .nav-item:hover .nav-icon { opacity: 0.9; }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      border-top: 1px solid var(--sidebar-border);
+      padding: 14px 12px;
+    }
+    .patient-card-sidebar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px; border-radius: 8px;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .patient-card-sidebar:hover { background: var(--sidebar-hover); }
+
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #7C3AED);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: white; flex-shrink: 0;
+    }
+    .avatar-lg { width: 56px; height: 56px; font-size: 22px; }
+
+    .sidebar-user-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .sidebar-user-role { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+    /* MAIN */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    .topbar {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 0 32px; height: 58px;
+      display: flex; align-items: center;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px; font-weight: 600; color: var(--text-primary); flex: 1;
+    }
+
+    .content { padding: 28px 32px; flex: 1; }
+
+    .tab-content { display: none; animation: fadeIn 0.2s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    .section-header {
+      display: flex; align-items: baseline;
+      justify-content: space-between; margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 700; color: var(--text-primary);
+    }
+    .section-sub { font-size: 13px; color: var(--text-secondary); margin-top: 3px; }
+
+    /* BUTTONS */
+    .btn-primary {
+      background: var(--accent); color: white;
+      border: none; border-radius: 8px;
+      padding: 9px 18px; font-size: 13px; font-weight: 600;
+      font-family: 'DM Sans', sans-serif; cursor: pointer;
+      transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(30,144,255,0.3); }
+    .btn-save { background: #059669; }
+    .btn-save:hover { background: #047857; }
+
+    .btn-ghost {
+      background: none; border: 1px solid var(--border);
+      color: var(--text-secondary); border-radius: 8px;
+      padding: 8px 16px; font-size: 13px; font-weight: 500;
+      font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* CARD */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 1px 6px rgba(11,35,64,0.04);
+    }
+    .card-header {
+      padding: 15px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-header-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .card-body { padding: 20px; }
+
+    /* GRIDS */
+    .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    .grid-2   { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    /* OVERVIEW SEARCH */
+    .overview-search-row { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+    .overview-search-input {
+      flex: 1; display: flex; align-items: center; gap: 9px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 16px; transition: all 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .overview-search-input:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(30,144,255,0.1); }
+    .overview-search-input input {
+      border: none; background: none; outline: none;
+      font-size: 13.5px; font-family: 'DM Sans', sans-serif;
+      color: var(--text-primary); flex: 1;
+    }
+    .overview-search-input input::placeholder { color: var(--text-muted); }
+    .scanner-btn-overview {
+      width: 42px; height: 42px; border-radius: 10px;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+    }
+    .scanner-btn-overview:hover { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(30,144,255,0.1); }
+
+    /* RX */
+    .rx-item { display: flex; align-items: flex-start; gap: 13px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+    .rx-item:last-child { border-bottom: none; }
+    .rx-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); margin-top: 5px; flex-shrink: 0; }
+    .rx-info { flex: 1; min-width: 0; }
+    .rx-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .rx-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .rx-meds { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
+
+    /* PILLS */
+    .pill { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500; }
+    .pill-blue   { background: var(--accent-muted); color: var(--accent); }
+    .pill-green  { background: var(--green-bg); color: #059669; }
+    .pill-amber  { background: var(--amber-bg); color: #D97706; }
+    .pill-purple { background: var(--purple-bg); color: var(--purple); }
+    .pill-grey   { background: var(--surface-2); color: var(--text-secondary); }
+
+    /* DOCTOR ROWS */
+    .doctor-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+    .doctor-row:last-child { border-bottom: none; }
+    .doctor-avatar {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: linear-gradient(135deg, #7C3AED, var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: white; font-weight: 700; flex-shrink: 0;
+    }
+    .doctor-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .doctor-spec { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+    .doctor-search-card {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 16px; border: 1px solid var(--border);
+      border-radius: 10px; margin-bottom: 10px;
+      background: var(--surface); transition: all 0.2s;
+    }
+    .doctor-search-card:hover { border-color: var(--accent); box-shadow: 0 2px 12px rgba(30,144,255,0.1); }
+    .verified-badge { font-size: 10px; background: var(--green-bg); color: #059669; padding: 2px 8px; border-radius: 20px; font-weight: 600; margin-left: 8px; }
+
+    /* DOCS TABLE */
+    .doc-table { width: 100%; border-collapse: collapse; }
+    .doc-table thead tr { border-bottom: 2px solid var(--border); }
+    .doc-table th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); padding: 0 0 11px; text-align: left; }
+    .doc-table th:last-child, .doc-table td:last-child { text-align: right; }
+    .doc-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    .doc-table tbody tr:last-child { border-bottom: none; }
+    .doc-table tbody tr:hover { background: var(--surface-2); }
+    .doc-table td { padding: 12px 0; font-size: 13px; }
+
+    /* UPLOAD */
+    .upload-area {
+      border: 2px dashed var(--border-dark); border-radius: 10px;
+      padding: 34px 24px; text-align: center; cursor: pointer;
+      transition: all 0.2s; background: var(--surface-2);
+    }
+    .upload-area:hover { border-color: var(--accent); background: var(--accent-muted); }
+    .upload-area h4 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-top: 12px; }
+    .upload-area p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-control {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+      border-radius: 8px; font-size: 13px;
+      font-family: 'DM Sans', sans-serif; color: var(--text-primary);
+      background: var(--surface); outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(30,144,255,0.08); }
+    textarea.form-control { resize: none; }
+
+    /* PROFILE */
+    .profile-hero {
+      background: linear-gradient(135deg, #0b2340, #1a3a6b);
+      border-radius: 14px; padding: 26px 28px; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 20px;
+    }
+    .profile-hero-info h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: #fff; font-weight: 700; }
+    .profile-hero-info p { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 5px; }
+    .profile-hero-tags { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .profile-tag {
+      font-size: 12px; padding: 4px 12px; border-radius: 20px; font-weight: 500;
+      background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* INFO GRID — view mode */
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .info-field {
+      padding: 13px 15px; border: 1px solid var(--border);
+      border-radius: 9px; background: var(--surface-2);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .info-field .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-muted); font-weight: 700; }
+    .info-field .val { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-top: 5px; }
+
+    /* Editable field highlight in edit mode */
+    .info-field.editing { border-color: var(--accent); background: #f0f8ff; }
+    .info-field .edit-input { display: none; margin-top: 6px; }
+    .info-field.editing .val { display: none; }
+    .info-field.editing .edit-input { display: block; }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 36px 20px; }
+    .empty-icon { width: 46px; height: 46px; background: var(--surface-2); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 13px; font-size: 20px; }
+    .empty-state h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 5px; }
+    .empty-state p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+    .divider { height: 1px; background: var(--border); margin: 18px 0; }
+
+    /* SCANNER */
+    .scanner-overlay { display: none; position: fixed; inset: 0; background: rgba(11,35,64,0.75); backdrop-filter: blur(10px); z-index: 1000; align-items: center; justify-content: center; }
+    .scanner-overlay.show { display: flex; }
+    .scanner-modal { background: var(--surface); border-radius: 16px; padding: 36px; text-align: center; max-width: 320px; width: 90%; }
+    .scanner-modal h3 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 8px; }
+    .scanner-modal p { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+    .scan-frame { width: 170px; height: 170px; border: 2px solid var(--accent); border-radius: 14px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; background: var(--surface-2); position: relative; overflow: hidden; font-size: 48px; }
+    .scan-line { position: absolute; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); animation: scanLine 2s ease-in-out infinite; }
+    @keyframes scanLine { 0%{top:0;opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{top:100%;opacity:0} }
+
+    /* Saving indicator */
+    .save-toast { position: fixed; bottom: 28px; right: 28px; background: #059669; color: white; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; display: none; z-index: 999; box-shadow: 0 4px 20px rgba(5,150,105,0.4); }
+    .save-toast.show { display: block; animation: toastIn 0.3s ease; }
+    @keyframes toastIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+
+    @media (max-width: 1100px) {
+      .grid-2-1 { grid-template-columns: 1fr; }
+      .info-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark"></div>
+    <span class="brand-name">Medinex</span>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Main</div>
+    <a class="nav-item active" onclick="showTab('overview', this)">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm8 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V4zm-8 8a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4zm8 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/></svg>
+      My Care
+    </a>
+    <a class="nav-item" onclick="showTab('prescriptions', this)">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+      Prescriptions
+    </a>
+    <a class="nav-item" onclick="showTab('documents', this)">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
+      Documents
+    </a>
+    <a class="nav-item" onclick="showTab('doctors', this)">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+      My Doctors
+    </a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Account</div>
+    <a class="nav-item" onclick="showTab('profile', this)">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+      My Profile
+    </a>
+    <a class="nav-item" onclick="logout()">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+      Log Out
+    </a>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="patient-card-sidebar" onclick="showTab('profile', null)">
+      <div class="avatar" id="sidebarAvatar">P</div>
+      <div>
+        <div class="sidebar-user-name" id="sidebarName">Patient</div>
+        <div class="sidebar-user-role">Patient · Medinex</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">My Care</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ OVERVIEW ═══ -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="overview-search-row">
+        <div class="overview-search-input">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="#8a97a8" stroke-width="2">
+            <circle cx="9" cy="9" r="6"/><path d="m15 15 4 4"/>
+          </svg>
+          <input type="text" placeholder="Search doctors by name or specialty..." id="doctorSearch" oninput="searchDoctors()" />
+        </div>
+        <div class="scanner-btn-overview" onclick="openScanner()" title="Scan QR Code">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+            <rect x="1" y="1" width="7" height="7" rx="1" stroke="#0b2340" stroke-width="1.8"/>
+            <rect x="3" y="3" width="3" height="3" fill="#0b2340"/>
+            <rect x="14" y="1" width="7" height="7" rx="1" stroke="#0b2340" stroke-width="1.8"/>
+            <rect x="16" y="3" width="3" height="3" fill="#0b2340"/>
+            <rect x="1" y="14" width="7" height="7" rx="1" stroke="#0b2340" stroke-width="1.8"/>
+            <rect x="3" y="16" width="3" height="3" fill="#0b2340"/>
+            <rect x="14" y="14" width="2" height="2" fill="#0b2340"/>
+            <rect x="18" y="14" width="2" height="2" fill="#0b2340"/>
+            <rect x="14" y="18" width="2" height="2" fill="#0b2340"/>
+            <rect x="18" y="18" width="2" height="2" fill="#0b2340"/>
+            <rect x="16" y="16" width="2" height="2" fill="#0b2340"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="grid-2-1">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-title">Recent Prescriptions</div>
+            <button class="btn-ghost" onclick="showTab('prescriptions', null)" style="font-size:12px;padding:5px 12px;">View All →</button>
+          </div>
+          <div class="card-body" id="overviewRx">
+            <div class="empty-state">
+              <div class="empty-icon">💊</div>
+              <h4>No Prescriptions Yet</h4>
+              <p>Connect with a doctor to receive digital prescriptions here.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-title">Recent connections</div>
+            <button class="btn-ghost" onclick="showTab('doctors', null)" style="font-size:12px;padding:5px 12px;">Manage</button>
+          </div>
+          <div class="card-body" id="overviewDoctors">
+            <div class="empty-state">
+              <div class="empty-icon">👨‍⚕️</div>
+              <h4>No Connections</h4>
+              <p>Search and connect with your doctors.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PRESCRIPTIONS ═══ -->
+    <div class="tab-content" id="tab-prescriptions">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Prescriptions</div>
+          <div class="section-sub">All prescriptions from your connected doctors</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body" id="allRxList">
+          <div class="empty-state">
+            <div class="empty-icon">💊</div>
+            <h4>No Prescriptions</h4>
+            <p>Your prescriptions from connected doctors will appear here.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ DOCUMENTS ═══ -->
+    <div class="tab-content" id="tab-documents">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Documents</div>
+          <div class="section-sub">Your uploaded medical records and reports</div>
+        </div>
+        <button class="btn-primary" onclick="toggleUploadForm()">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+          Upload Document
+        </button>
+      </div>
+
+      <div class="card" id="uploadFormCard" style="display:none;margin-bottom:20px;">
+        <div class="card-header">
+          <div class="card-header-title">Upload New Document</div>
+          <button class="btn-ghost" onclick="toggleUploadForm()" style="font-size:12px;padding:5px 12px;">Cancel</button>
+        </div>
+        <div class="card-body">
+          <div class="upload-area" onclick="document.getElementById('docFile').click()">
+            <svg width="34" height="34" viewBox="0 0 20 20" fill="#8a97a8"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+            <h4>Click to browse files</h4>
+            <p>PDF, JPG, PNG supported · Max 10MB</p>
+          </div>
+          <input type="file" id="docFile" style="display:none" />
+          <div class="divider"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Document Type</label>
+              <select class="form-control" id="docType">
+                <option value="" disabled selected>Select type</option>
+                <option value="prescription">Prescription</option>
+                <option value="report">Medical Report</option>
+                <option value="xray">X-Ray / Scan</option>
+                <option value="test">Lab Test</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Document Date</label>
+              <input type="date" class="form-control" id="docDate" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Document Name</label>
+            <input type="text" class="form-control" id="docName" placeholder="e.g. Blood Test — January 2025" />
+          </div>
+          <button class="btn-primary" onclick="uploadDocument()" style="width:100%;justify-content:center;">Upload Document</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-title">All Documents</div>
+          <span id="docCount" style="font-size:12px;color:var(--text-muted);">0 files</span>
+        </div>
+        <div class="card-body" id="docsTableWrap">
+          <div class="empty-state">
+            <div class="empty-icon">📁</div>
+            <h4>No Documents Uploaded</h4>
+            <p>Upload prescriptions, lab reports, X-rays and other medical records.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ DOCTORS ═══ -->
+    <div class="tab-content" id="tab-doctors">
+      <div class="section-header">
+        <div>
+          <div class="section-title">My Doctors</div>
+          <div class="section-sub">Search and manage your connected healthcare providers</div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-header-title">Connected Doctors</div></div>
+          <div class="card-body" id="connectedDoctorsList">
+            <div class="empty-state">
+              <div class="empty-icon">🩺</div>
+              <h4>No Connected Doctors</h4>
+              <p>Search for doctors on the right and send connection requests.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-header-title">Search Results</div></div>
+          <div class="card-body" id="doctorResults">
+            <div class="empty-state">
+              <div class="empty-icon">🔍</div>
+              <h4>Search for Doctors</h4>
+              <p>Use the search bar in My Care to find doctors.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PROFILE ═══ -->
+    <div class="tab-content" id="tab-profile">
+      <div class="section-header">
+        <div class="section-title">My Profile</div>
+        <div style="display:flex;gap:8px;">
+          <!-- Edit button — shown in view mode -->
+          <button class="btn-primary" id="btnEdit" onclick="startEdit()">
+            <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+            Edit Profile
+          </button>
+          <!-- Save + Cancel — shown in edit mode -->
+          <button class="btn-primary btn-save" id="btnSave" style="display:none;" onclick="saveProfile()">✓ Save Changes</button>
+          <button class="btn-ghost" id="btnCancel" style="display:none;" onclick="cancelEdit()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Profile Hero -->
+      <div class="profile-hero">
+        <div class="avatar avatar-lg" id="profilePic">P</div>
+        <div class="profile-hero-info">
+          <h2 id="profileName">Patient Name</h2>
+          <p id="profileEmailDisplay">—</p>
+          <div class="profile-hero-tags">
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Grid — fields are inline editable -->
+      <div class="card">
+        <div class="card-header"><div class="card-header-title">Personal Information</div></div>
+        <div class="card-body">
+          <div class="info-grid">
+
+            <!-- READ-ONLY fields (set at registration, cannot change here) -->
+            <div class="info-field">
+              <div class="lbl">First Name</div>
+              <div class="val" id="pf-firstname">—</div>
+            </div>
+            <div class="info-field">
+              <div class="lbl">Last Name</div>
+              <div class="val" id="pf-lastname">—</div>
+            </div>
+            <div class="info-field">
+              <div class="lbl">Email</div>
+              <div class="val" id="pf-email" style="font-size:12px;word-break:break-all;">—</div>
+            </div>
+            <div class="info-field">
+              <div class="lbl">Phone</div>
+              <div class="val" id="pf-phone">—</div>
+            </div>
+            <div class="info-field">
+              <div class="lbl">Date of Birth</div>
+              <div class="val" id="pf-dob">—</div>
+            </div>
+            <div class="info-field">
+              <div class="lbl">Blood Group</div>
+              <div class="val" id="pf-blood">—</div>
+            </div>
+
+            <!-- EDITABLE fields — same cell, input appears on edit -->
+            <div class="info-field" id="ef-height">
+              <div class="lbl">Height</div>
+              <div class="val" id="pf-height">—</div>
+              <input type="number" class="form-control edit-input" id="edit_height" placeholder="cm" />
+            </div>
+            <div class="info-field" id="ef-weight">
+              <div class="lbl">Weight</div>
+              <div class="val" id="pf-weight">—</div>
+              <input type="number" class="form-control edit-input" id="edit_weight" placeholder="kg" />
+            </div>
+            <div class="info-field" id="ef-city">
+              <div class="lbl">City</div>
+              <div class="val" id="pf-city">—</div>
+              <input type="text" class="form-control edit-input" id="edit_city" placeholder="Your city" />
+            </div>
+            <div class="info-field" id="ef-state">
+              <div class="lbl">State</div>
+              <div class="val" id="pf-state">—</div>
+              <input type="text" class="form-control edit-input" id="edit_state" placeholder="Your state" />
+            </div>
+            <div class="info-field" id="ef-allergies" style="grid-column: span 2;">
+              <div class="lbl">Allergies</div>
+              <div class="val" id="pf-allergies">—</div>
+              <textarea class="form-control edit-input" id="edit_allergies" placeholder="e.g. Penicillin, Peanuts..." style="height:60px;"></textarea>
+            </div>
+            <div class="info-field" id="ef-chronic">
+              <div class="lbl">Chronic Condition</div>
+              <div class="val" id="pf-chronic">—</div>
+              <select class="form-control edit-input" id="edit_chronic">
+                <option value="">Select condition</option>
+                <option value="none">None</option>
+                <option value="diabetes">Diabetes</option>
+                <option value="hypertension">Hypertension</option>
+                <option value="hypotension">Hypotension</option>
+                <option value="asthma">Asthma</option>
+                <option value="heart_disease">Cardiac Disease</option>
+                <option value="thyroid">Thyroid Disorder</option>
+                <option value="renal_disease">Renal Disorder</option>
+                <option value="liver_disease">Liver Disease</option>
+                <option value="arthritis">Arthritis</option>
+                <option value="epilepsy">Epilepsy</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- SCANNER OVERLAY -->
+<div class="scanner-overlay" id="scannerOverlay">
+  <div class="scanner-modal">
+    <h3>Scan Document</h3>
+    <p>Point your camera at a QR code or barcode to scan a medical document or doctor ID.</p>
+    <div class="scan-frame">📷<div class="scan-line"></div></div>
+    <button class="btn-ghost" onclick="closeScanner()" style="width:100%;">Close</button>
+  </div>
+</div>
+
+<!-- SAVE TOAST -->
+<div class="save-toast" id="saveToast">✓ Profile saved successfully!</div>
+
+<script>
+  // ══════════════════════════════════════
+  // TABS
+  // ══════════════════════════════════════
+  const tabTitles = {
+    overview: 'My Care',
+    prescriptions: 'Prescriptions',
+    documents: 'Documents',
+    doctors: 'My Doctors',
+    profile: 'My Profile'
+  };
+
+  function showTab(tab, el) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const tabEl = document.getElementById('tab-' + tab);
+    if (tabEl) tabEl.classList.add('active');
+    document.getElementById('topbarTitle').textContent = tabTitles[tab] || tab;
+    if (el) el.classList.add('active');
+  }
+
+  // ══════════════════════════════════════
+  // SCANNER
+  // ══════════════════════════════════════
+  function openScanner()  { document.getElementById('scannerOverlay').classList.add('show'); }
+  function closeScanner() { document.getElementById('scannerOverlay').classList.remove('show'); }
+
+  // ══════════════════════════════════════
+  // DOCTORS
+  // ══════════════════════════════════════
+  const sampleDoctors = [
+    { name:'Dr. Priya Sharma',  specialty:'Cardiologist',        verified:true,  init:'P' },
+    { name:'Dr. Rahul Mehta',   specialty:'Dermatologist',       verified:true,  init:'R' },
+    { name:'Dr. Anjali Singh',  specialty:'Neurologist',         verified:true,  init:'A' },
+    { name:'Dr. Vikram Patel',  specialty:'Orthopedic Surgeon',  verified:false, init:'V' },
+    { name:'Dr. Neha Gupta',    specialty:'Paediatrician',       verified:true,  init:'N' },
+  ];
+
+  function searchDoctors() {
+    const q = document.getElementById('doctorSearch').value.toLowerCase();
+    const el = document.getElementById('doctorResults');
+
+    // Auto-switch to doctors tab
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('tab-doctors').classList.add('active');
+    document.getElementById('topbarTitle').textContent = 'My Doctors';
+
+    if (!q) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><h4>Search for Doctors</h4><p>Type a name or specialty above.</p></div>';
+      return;
+    }
+    const found = sampleDoctors.filter(d =>
+      d.name.toLowerCase().includes(q) || d.specialty.toLowerCase().includes(q)
+    );
+    if (!found.length) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">😕</div><h4>No Results</h4><p>No doctors found.</p></div>';
+      return;
+    }
+    el.innerHTML = found.map(d =>
+      '<div class="doctor-search-card">' +
+        '<div class="doctor-avatar">' + d.init + '</div>' +
+        '<div style="flex:1">' +
+          '<div class="doctor-name">' + d.name + (d.verified ? '<span class="verified-badge">Verified</span>' : '') + '</div>' +
+          '<div class="doctor-spec">' + d.specialty + '</div>' +
+        '</div>' +
+        '<button class="btn-primary" style="font-size:12px;padding:7px 14px;" onclick="connectDoctor(\'' + d.name + '\',\'' + d.specialty + '\',\'' + d.init + '\')">Connect</button>' +
+      '</div>'
+    ).join('');
+  }
+
+  const connectedDoctors = [];
+
+  function connectDoctor(name, spec, init) {
+    if (connectedDoctors.find(d => d.name === name)) { alert('Already connected!'); return; }
+    connectedDoctors.push({ name, spec, init });
+    renderConnectedDoctors();
+    alert('Connection request sent to ' + name);
+  }
+
+  function renderConnectedDoctors() {
+    const html = connectedDoctors.length
+      ? connectedDoctors.map(d =>
+          '<div class="doctor-row">' +
+            '<div class="doctor-avatar">' + d.init + '</div>' +
+            '<div style="flex:1"><div class="doctor-name">' + d.name + '</div><div class="doctor-spec">' + d.spec + '</div></div>' +
+            '<div class="status-dot"></div>' +
+          '</div>'
+        ).join('')
+      : '<div class="empty-state"><div class="empty-icon">🩺</div><h4>No Connections</h4><p>No connected doctors yet.</p></div>';
+    document.getElementById('connectedDoctorsList').innerHTML = html;
+    document.getElementById('overviewDoctors').innerHTML = html;
+  }
+
+  // ══════════════════════════════════════
+  // DOCUMENTS
+  // ══════════════════════════════════════
+  const myDocs = [];
+
+  function toggleUploadForm() {
+    const c = document.getElementById('uploadFormCard');
+    c.style.display = c.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function uploadDocument() {
+    const type = document.getElementById('docType').value;
+    const name = document.getElementById('docName').value.trim();
+    const date = document.getElementById('docDate').value;
+    if (!type || !name || !date) { alert('Please fill all fields.'); return; }
+    myDocs.unshift({ type, name, date });
+    renderDocs();
+    toggleUploadForm();
+    ['docType','docName','docDate'].forEach(id => { document.getElementById(id).value = ''; });
+    alert('Document uploaded successfully.');
+  }
+
+  const typeConfig = {
+    prescription: { label:'Prescription', cls:'pill-amber' },
+    report:       { label:'Report',       cls:'pill-blue'  },
+    xray:         { label:'X-Ray',        cls:'pill-purple'},
+    test:         { label:'Lab Test',     cls:'pill-green' },
+    other:        { label:'Other',        cls:'pill-grey'  },
+  };
+
+  function renderDocs() {
+    const wrap = document.getElementById('docsTableWrap');
+    document.getElementById('docCount').textContent = myDocs.length + ' file' + (myDocs.length !== 1 ? 's' : '');
+    if (!myDocs.length) {
+      wrap.innerHTML = '<div class="empty-state"><div class="empty-icon">📁</div><h4>No Documents</h4><p>Upload your medical records here.</p></div>';
+      return;
+    }
+    wrap.innerHTML = '<table class="doc-table"><thead><tr><th>Name</th><th>Type</th><th>Date</th><th>Action</th></tr></thead><tbody>' +
+      myDocs.map(d => {
+        const cfg = typeConfig[d.type] || typeConfig.other;
+        return '<tr><td style="font-weight:600">' + d.name + '</td>' +
+          '<td><span class="pill ' + cfg.cls + '">' + cfg.label + '</span></td>' +
+          '<td style="font-family:\'DM Mono\',monospace;font-size:12px;color:var(--text-muted)">' + d.date + '</td>' +
+          '<td><button class="btn-ghost" style="font-size:11px;padding:4px 10px">View</button></td></tr>';
+      }).join('') +
+      '</tbody></table>';
+  }
+
+  // ══════════════════════════════════════
+  // PROFILE — fetch from DB, fallback localStorage
+  // ══════════════════════════════════════
+  function loadProfile() {
+    const token = localStorage.getItem('access_token');
+    if (!token) { renderProfileFromStorage(); return; }
+
+    fetch('http://127.0.0.1:8000/api/auth/me/', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(r) {
+      //if (r.status === 401) { logout(); throw new Error('unauth'); }
+      //if (!r.ok) throw new Error('fail');
+      return r.json();
+    })
+    .then(function(data) {
+      // Save fresh data to localStorage as cache
+      localStorage.setItem('user_firstname', data.first_name        || '');
+      localStorage.setItem('user_lastname',  data.last_name         || '');
+      localStorage.setItem('user_email',     data.email             || '');
+      localStorage.setItem('user_phone',     data.phone             || '');
+      localStorage.setItem('user_dob',       data.dob               || '');
+      localStorage.setItem('user_blood',     data.blood_group       || '');
+      localStorage.setItem('user_height',    data.height != null ? String(data.height) : '');
+      localStorage.setItem('user_weight',    data.weight != null ? String(data.weight) : '');
+      localStorage.setItem('user_city',      data.city              || '');
+      localStorage.setItem('user_state',     data.state             || '');
+      localStorage.setItem('user_allergies', data.allergies         || '');
+      localStorage.setItem('user_chronic',   data.chronic_condition || '');
+      renderProfileFromStorage();
+    })
+    .catch(function() {
+      // Server offline — use localStorage cache
+      renderProfileFromStorage();
+    });
+  }
+
+  function renderProfileFromStorage() {
+    var fn       = localStorage.getItem('user_firstname') || '';
+    var ln       = localStorage.getItem('user_lastname')  || '';
+    var email    = localStorage.getItem('user_email')     || '';
+    var phone    = localStorage.getItem('user_phone')     || '';
+    var dob      = localStorage.getItem('user_dob')       || '';
+    var blood    = localStorage.getItem('user_blood')     || '';
+    var height   = localStorage.getItem('user_height')    || '';
+    var weight   = localStorage.getItem('user_weight')    || '';
+    var city     = localStorage.getItem('user_city')      || '';
+    var state    = localStorage.getItem('user_state')     || '';
+    var allergies= localStorage.getItem('user_allergies') || '';
+    var chronic  = localStorage.getItem('user_chronic')   || '';
+
+    var initial  = fn ? fn.charAt(0).toUpperCase() : 'P';
+    var fullName = (fn + ' ' + ln).trim() || 'Patient';
+
+    // Avatars
+    var sa = document.getElementById('sidebarAvatar');
+    var pp = document.getElementById('profilePic');
+    if (sa) sa.textContent = initial;
+    if (pp) pp.textContent = initial;
+
+    // Sidebar name
+    var sn = document.getElementById('sidebarName');
+    if (sn) sn.textContent = fn || 'Patient';
+
+    // Profile hero
+    document.getElementById('profileName').textContent        = fullName;
+    document.getElementById('profileEmailDisplay').textContent= email  || '—';
+    //document.getElementById('profileBloodTag').textContent    = 'Blood Group: ' + (blood || '—');
+
+    // Fields
+    document.getElementById('pf-firstname').textContent = fn       || '—';
+    document.getElementById('pf-lastname').textContent  = ln       || '—';
+    document.getElementById('pf-email').textContent     = email    || '—';
+    document.getElementById('pf-phone').textContent     = phone    || '—';
+    document.getElementById('pf-dob').textContent       = dob      || '—';
+    document.getElementById('pf-blood').textContent     = blood    || '—';
+    document.getElementById('pf-height').textContent    = height   ? height  + ' cm' : '—';
+    document.getElementById('pf-weight').textContent    = weight   ? weight  + ' kg' : '—';
+    document.getElementById('pf-city').textContent      = city     || '—';
+    document.getElementById('pf-state').textContent     = state    || '—';
+    document.getElementById('pf-allergies').textContent = allergies|| '—';
+    document.getElementById('pf-chronic').textContent   = chronic  || '—';
+  }
+
+  // ── INLINE EDIT ──
+  var editableFields = ['height','weight','city','state','allergies','chronic'];
+
+  function startEdit() {
+    // Fill inputs with current values
+    document.getElementById('edit_height').value    = localStorage.getItem('user_height')    || '';
+    document.getElementById('edit_weight').value    = localStorage.getItem('user_weight')    || '';
+    document.getElementById('edit_city').value      = localStorage.getItem('user_city')      || '';
+    document.getElementById('edit_state').value     = localStorage.getItem('user_state')     || '';
+    document.getElementById('edit_allergies').value = localStorage.getItem('user_allergies') || '';
+    var chronicVal = localStorage.getItem('user_chronic') || '';
+    var sel = document.getElementById('edit_chronic');
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === chronicVal) { sel.selectedIndex = i; break; }
+    }
+
+    // Show edit inputs, hide display values
+    editableFields.forEach(function(f) {
+      var cell = document.getElementById('ef-' + f);
+      if (cell) cell.classList.add('editing');
+    });
+
+    // Swap buttons
+    document.getElementById('btnEdit').style.display   = 'none';
+    document.getElementById('btnSave').style.display   = 'inline-flex';
+    document.getElementById('btnCancel').style.display = 'inline-flex';
+  }
+
+  function cancelEdit() {
+    editableFields.forEach(function(f) {
+      var cell = document.getElementById('ef-' + f);
+      if (cell) cell.classList.remove('editing');
+    });
+    document.getElementById('btnEdit').style.display   = 'inline-flex';
+    document.getElementById('btnSave').style.display   = 'none';
+    document.getElementById('btnCancel').style.display = 'none';
+  }
+
+  function saveProfile() {
+    var height    = document.getElementById('edit_height').value.trim();
+    var weight    = document.getElementById('edit_weight').value.trim();
+    var city      = document.getElementById('edit_city').value.trim();
+    var state     = document.getElementById('edit_state').value.trim();
+    var allergies = document.getElementById('edit_allergies').value.trim();
+    var chronic   = document.getElementById('edit_chronic').value;
+
+    // Save to localStorage immediately (instant UI update)
+    localStorage.setItem('user_height',    height);
+    localStorage.setItem('user_weight',    weight);
+    localStorage.setItem('user_city',      city);
+    localStorage.setItem('user_state',     state);
+    localStorage.setItem('user_allergies', allergies);
+    localStorage.setItem('user_chronic',   chronic);
+
+    // Save to DATABASE permanently
+    var token = localStorage.getItem('access_token');
+    if (token) {
+      fetch('http://127.0.0.1:8000/api/auth/patient/profile/update/', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+          height: height,
+          weight: weight,
+          city: city,
+          state: state,
+          allergies: allergies,
+          chronic_condition: chronic
+        })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function() {
+        showToast('Profile saved to database!');
+      })
+      .catch(function() {
+        showToast('Saved locally (server offline)');
+      });
+    }
+
+    // Update display
+    renderProfileFromStorage();
+    cancelEdit();
+  }
+
+  function showToast(msg) {
+    var t = document.getElementById('saveToast');
+    t.textContent = '✓ ' + msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 3000);
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = 'index.html';
+  }
+
+  // ══════════════════════════════════════
+  // INIT — load everything on page open
+  // ══════════════════════════════════════
+  loadProfile();
+  renderDocs();
+  renderConnectedDoctors();
+</script>
+</body>
+</html>

@@ -19,3 +19,9 @@ dist/
 *.swp
 Thumbs.db
 .DS_Store
+# Database — real user data, kabhi push mat karo
+db.sqlite3
+
+# Environment variables
+.env
+*.env

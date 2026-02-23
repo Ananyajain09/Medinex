@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - Medinex</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background-color: #f6f3ef; color: #0b2340; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 30px 0; }
+    .wrapper { background: white; padding: 40px 32px; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.12); width: 100%; max-width: 460px; margin: 20px; }
+    .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; justify-content: center; }
+    .logo-icon { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #0b60c1, #1e90ff, #4fc3f7); position: relative; box-shadow: 0 4px 14px rgba(11,96,193,0.4); }
+    .logo-icon::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 22px; background: white; border-radius: 3px; }
+    .logo-icon::after { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 10px; background: white; border-radius: 3px; }
+    .logo h1 { font-size: 26px; font-weight: 800; color: #0b2340; }
+    h2 { text-align: center; margin-bottom: 8px; color: #0b2340; font-size: 22px; font-weight: 700; }
+    .subtitle { text-align: center; color: #6d7c92; font-size: 14px; margin-bottom: 28px; }
+    .role-selector { display: flex; gap: 15px; margin-bottom: 25px; }
+    .role-btn { flex: 1; padding: 18px 15px; border-radius: 16px; border: 2px solid #e8e0d5; background: #f8f5f2; cursor: pointer; font-size: 15px; font-weight: 600; color: #0b2340; transition: all 0.3s; text-align: center; font-family: 'Poppins', sans-serif; }
+    .role-btn:hover { border-color: #1e90ff; background: #f0f8ff; }
+    .role-prompt { text-align: center; color: #6d7c92; font-size: 15px; padding: 20px; background: #f8f5f2; border-radius: 16px; }
+    .role-badge { display: none; align-items: center; gap: 10px; background: #e6f3ff; border: 2px solid #1e90ff; border-radius: 16px; padding: 12px 18px; margin-bottom: 24px; font-weight: 600; color: #1e90ff; font-size: 15px; }
+    .form-section { display: none; animation: fadeIn 0.3s ease; }
+    .form-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    input, select, textarea { width: 100%; padding: 14px 16px; margin-bottom: 14px; border-radius: 16px; border: 2px solid #e8e0d5; font-size: 15px; background: #fdfdfd; color: #0b2340; transition: all 0.3s; font-family: 'Poppins', sans-serif; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #1e90ff; box-shadow: 0 4px 12px rgba(30,144,255,0.15); background: white; }
+    textarea { resize: none; height: 85px; }
+    .row { display: flex; gap: 12px; }
+    .row input { flex: 1; }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+    .section-label { font-size: 12px; font-weight: 700; color: #6d7c92; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; margin-top: 8px; }
+    .optional-tag { font-size: 11px; color: #aaa; font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 6px; }
+    .divider { height: 1px; background: #f0ebe4; margin: 6px 0 20px 0; }
+    .btn-submit { width: 100%; padding: 16px; border-radius: 16px; border: none; background: linear-gradient(135deg, #1e90ff, #0b60c1); color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; transition: all 0.3s; font-family: 'Poppins', sans-serif; }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(30,144,255,0.35); }
+    .login-link { text-align: center; margin-top: 22px; font-size: 14px; color: #6d7c92; padding-top: 20px; border-top: 1px solid #e8e0d5; }
+    .login-link a { color: #1e90ff; font-weight: 600; text-decoration: none; }
+    .doctor-note { background: #fff8e6; border: 1px solid #ffd87a; border-radius: 12px; padding: 12px 16px; margin-bottom: 18px; font-size: 13px; color: #8a6500; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="logo">
+      <div class="logo-icon"></div>
+      <h1>Medinex</h1>
+    </div>
+
+    <h2>Create Account</h2>
+    <p class="subtitle">Join Medinex today</p>
+
+    <div id="roleSelectorSection">
+      <div class="role-selector">
+        <button class="role-btn" onclick="selectRole('patient')">🧑 Patient</button>
+        <button class="role-btn" onclick="selectRole('doctor')">👨‍⚕️ Doctor</button>
+      </div>
+      <div class="role-prompt">Choose account type</div>
+    </div>
+
+    <div class="role-badge" id="roleBadge">
+      <span id="roleBadgeIcon"></span>
+      <span id="roleBadgeText"></span>
+    </div>
+
+    <!-- PATIENT FORM -->
+    <div class="form-section" id="patientForm">
+      <div class="section-label">Basic Info</div>
+      <div class="row">
+        <input type="text" id="p_firstname" placeholder="First Name" />
+        <input type="text" id="p_lastname" placeholder="Last Name" />
+      </div>
+      <input type="email" id="p_email" placeholder="Email Address" />
+      <input type="tel" id="p_phone" placeholder="Phone Number" />
+      <div class="row">
+        <input type="text" id="p_city" placeholder="City" />
+        <input type="text" id="p_state" placeholder="State" />
+      </div>
+      <input type="password" id="p_password" placeholder="Password" />
+
+      <div class="divider"></div>
+      <div class="section-label">Personal Details</div>
+      <input type="date" id="p_dob" placeholder="Date of Birth (DD/MM/YYYY)" />
+      <div class="row">
+        <input type="number" id="p_height" placeholder="Height in cm (e.g. 170)" min="0" />
+        <input type="number" id="p_weight" placeholder="Weight in kg (e.g. 65)" min="0" />
+      </div>
+      <select id="p_blood">
+        <option value="" disabled selected>Blood Group</option>
+        <option>A+</option><option>A-</option>
+        <option>B+</option><option>B-</option>
+        <option>O+</option><option>O-</option>
+        <option>AB+</option><option>AB-</option>
+      </select>
+
+      <div class="divider"></div>
+      <div class="section-label">Health Info <span class="optional-tag">(optional)</span></div>
+      <textarea id="p_allergies" placeholder="Any allergies? e.g. Penicillin, Peanuts, Dust..."></textarea>
+      <select id="p_chronic">
+        <option value="" disabled selected>Any chronic conditions?</option>
+        <option value="none">None</option>
+        <option value="diabetes">Diabetes</option>
+        <option value="hypertension">Hypertension (High BP)</option>
+        <option value="hypotension">Hypotension (Low BP)</option>
+        <option value="asthma">Asthma</option>
+        <option value="heart_disease">Cardiac Disease</option>
+        <option value="thyroid">Thyroid Disorder</option>
+        <option value="renal_disease">Renal (Kidney) Disorder</option>
+        <option value="liver_disease">Liver Disease</option>
+        <option value="cancer">Cancer</option>
+        <option value="arthritis">Arthritis</option>
+        <option value="epilepsy">Epilepsy</option>
+        <option value="other">Other</option>
+      </select>
+      <button class="btn-submit" onclick="register('patient')">Create Patient Account</button>
+    </div>
+
+    <!-- DOCTOR FORM -->
+    <div class="form-section" id="doctorForm">
+      <div class="doctor-note">⚠️ Doctor accounts require verification before activation.</div>
+      <div class="section-label">Basic Info</div>
+      <div class="row">
+        <input type="text" id="d_firstname" placeholder="First Name" />
+        <input type="text" id="d_lastname" placeholder="Last Name" />
+      </div>
+      <input type="email" id="d_email" placeholder="Email Address" />
+      <input type="tel" id="d_phone" placeholder="Phone Number" />
+      <div class="row">
+        <input type="text" id="d_city" placeholder="City" />
+        <input type="text" id="d_state" placeholder="State" />
+      </div>
+      <input type="password" id="d_password" placeholder="Password" />
+
+      <div class="divider"></div>
+      <div class="section-label">Professional Details</div>
+      <input type="text" id="d_specialty" placeholder="Specialty (e.g. Cardiologist)" />
+      <input type="text" id="d_license" placeholder="License Number" />
+      <input type="text" id="d_hospital" placeholder="Hospital / Clinic Name (optional)" />
+      <button class="btn-submit" onclick="register('doctor')">Create Doctor Account 🎉</button>
+    </div>
+
+    <p class="login-link">Already have an account? <a href="index.html#login" onclick="localStorage.setItem('openLogin', 'true')">Login here</a></p>
+  </div>
+
+  <script>
+    function selectRole(role) {
+      document.getElementById('roleSelectorSection').style.display = 'none';
+      const badge = document.getElementById('roleBadge');
+      badge.style.display = 'flex';
+      document.getElementById('roleBadgeIcon').textContent = role === 'patient' ? '🧑' : '👨‍⚕️';
+      document.getElementById('roleBadgeText').textContent = role === 'patient' ? 'Registering as Patient' : 'Registering as Doctor';
+      document.getElementById(role === 'patient' ? 'patientForm' : 'doctorForm').classList.add('active');
+    }
+
+    async function register(role) {
+      let body = {};
+
+      if (role === 'patient') {
+        const firstname = document.getElementById('p_firstname').value.trim();
+        const lastname = document.getElementById('p_lastname').value.trim();
+        const email = document.getElementById('p_email').value.trim();
+        const phone = document.getElementById('p_phone').value.trim();
+        const password = document.getElementById('p_password').value;
+
+        if (!firstname || !lastname || !email || !phone || !password) {
+          alert('Please fill all required details!'); return;
+        }
+        if (password.length < 6) {
+          alert('Password should contain at least 6 characters!'); return;
+        }
+
+        body = {
+          first_name: firstname,
+          last_name: lastname,
+          email, phone, password,
+          role: 'patient',
+          dob: document.getElementById('p_dob').value.trim(),
+          blood_group: document.getElementById('p_blood').value,
+          height: document.getElementById('p_height').value,
+          weight: document.getElementById('p_weight').value,
+          city: document.getElementById('p_city').value.trim(),
+          state: document.getElementById('p_state').value.trim(),
+          allergies: document.getElementById('p_allergies').value,
+          chronic: document.getElementById('p_chronic').value,
+        };
+
+      } else {
+        const firstname = document.getElementById('d_firstname').value.trim();
+        const lastname = document.getElementById('d_lastname').value.trim();
+        const email = document.getElementById('d_email').value.trim();
+        const phone = document.getElementById('d_phone').value.trim();
+        const password = document.getElementById('d_password').value;
+        const specialty = document.getElementById('d_specialty').value.trim();
+        const license = document.getElementById('d_license').value.trim();
+
+        if (!firstname || !lastname || !email || !phone || !password || !specialty || !license) {
+          alert('Please fill all required details!'); return;
+        }
+        if (password.length < 6) {
+          alert('Password should contain at least 6 characters!'); return;
+        }
+
+        body = {
+          first_name: firstname,
+          last_name: lastname,
+          email, phone, password,
+          role: 'doctor',
+          specialty: specialty,
+          license_number: license,
+          hospital: document.getElementById('d_hospital').value.trim(),
+          city: document.getElementById('d_city').value.trim(),
+          state: document.getElementById('d_state').value.trim(),
+        };
+      }
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/auth/register/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('access_token', data.access);
+          localStorage.setItem('refresh_token', data.refresh);
+          localStorage.setItem('role', data.role);
+          localStorage.setItem('user_firstname', data.first_name  || '');
+          localStorage.setItem('user_lastname',  data.last_name   || '');
+          localStorage.setItem('user_email',     data.email       || '');
+          localStorage.setItem('user_phone',     data.phone       || '');
+          
+          if (role === 'patient') {
+            localStorage.setItem('user_dob',       body.dob         || '');
+            localStorage.setItem('user_blood',     body.blood_group || '');
+            localStorage.setItem('user_height',    body.height      || '');
+            localStorage.setItem('user_weight',    body.weight      || '');
+            localStorage.setItem('user_city',      body.city        || '');
+            localStorage.setItem('user_state',     body.state       || '');
+            localStorage.setItem('user_allergies', body.allergies   || '');
+            localStorage.setItem('user_chronic',   body.chronic     || '');
+          }
+          alert('Account created successfully! Welcome to Medinex 🎉');
+
+          if (role === 'patient') {
+            window.location.href = 'dashboard_patient.html';
+          } else {
+            window.location.href = 'dashboard_doctor.html';
+          }
+        } else {
+          alert('Error: ' + JSON.stringify(data));
+        }
+      } catch (err) {
+        alert('Server se connect nahi ho pa raha! Check karo server chal raha hai.');
+      }
+    }
+  </script>
+</body>
+</html>
